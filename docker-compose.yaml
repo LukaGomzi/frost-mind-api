@@ -1,16 +1,16 @@
 version: '3.9'
 
 services:
-  postgres:
+  our-freezer-postgres:
     image: postgres:15
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - our-freezer-postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=nimda
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=full_app_template
+      - POSTGRES_DB=our-freezer-db
 
 volumes:
-  postgres_data:
+  our-freezer-postgres_data:

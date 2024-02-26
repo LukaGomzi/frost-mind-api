@@ -4,27 +4,22 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+      @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  /**
-   * this is function is used to create User in User Entity.
-   * @param createUserDto this will type of createUserDto in which
-   * we have defined what are the keys we are expecting from body
-   * @returns promise of user
-   */
-  createUser(createUserDto: CreateUserDto): Promise<User> {
-    const user: User = new User();
-    user.name = createUserDto.name;
-    user.age = createUserDto.age;
-    user.email = createUserDto.email;
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const user = new User();
+    // Assuming you want to keep the username and email fields as is
     user.username = createUserDto.username;
-    user.password = createUserDto.password;
-    user.gender = createUserDto.gender;
+    user.email = createUserDto.email;
+    // Hash the password before storing it
+    const salt = await bcrypt.genSalt();
+    user.password_hash = await bcrypt.hash(createUserDto.password, salt);
     return this.userRepository.save(user);
   }
 
@@ -32,30 +27,21 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  /**
-   * this function used to get data of use whose id is passed in parameter
-   * @param id is type of number, which represent the id of user.
-   * @returns promise of user
-   */
   viewUser(id: number): Promise<User> {
     return this.userRepository.findOneBy({ id });
   }
 
-  /**
-   * this function is used to updated specific user whose id is passed in
-   * parameter along with passed updated data
-   * @param id is type of number, which represent the id of user.
-   * @param updateUserDto this is partial type of createUserDto.
-   * @returns promise of udpate user
-   */
-  updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user: User = new User();
-    user.name = updateUserDto.name;
-    user.age = updateUserDto.age;
-    user.email = updateUserDto.email;
-    user.username = updateUserDto.username;
-    user.password = updateUserDto.password;
-    user.id = id;
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (updateUserDto.username) user.username = updateUserDto.username;
+    if (updateUserDto.email) user.email = updateUserDto.email;
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt();
+      user.password_hash = await bcrypt.hash(updateUserDto.password, salt);
+    }
     return this.userRepository.save(user);
   }
 
