@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -45,5 +45,27 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.removeUser(+id);
+  }
+
+  @Post('register')
+  async register(@Body() createUserDto: CreateUserDto) {
+    try {
+      const newUser = await this.userService.createUser(createUserDto);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'User successfully registered',
+        data: {
+          id: newUser.id,
+          username: newUser.username,
+          email: newUser.email,
+          created_at: newUser.created_at,
+        },
+      };
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.BAD_REQUEST,
+        error: 'There was a problem registering the user.',
+      }, HttpStatus.BAD_REQUEST);
+    }
   }
 }

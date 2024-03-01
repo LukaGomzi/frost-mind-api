@@ -14,10 +14,9 @@ export class UserService {
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const user = new User();
-    // Assuming you want to keep the username and email fields as is
     user.username = createUserDto.username;
     user.email = createUserDto.email;
-    // Hash the password before storing it
+
     const salt = await bcrypt.genSalt();
     user.password_hash = await bcrypt.hash(createUserDto.password, salt);
     return this.userRepository.save(user);

@@ -1,16 +1,16 @@
 version: '3.9'
 
 services:
-  our-freezer-postgres:
+  frost-mind-postgres:
     image: postgres:15
     ports:
       - "5432:5432"
     volumes:
-      - our-freezer-postgres_data:/var/lib/postgresql/data
+      - frost-mind-postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=our-freezer-db
+      - POSTGRES_DB=frost-mind-db
 
 volumes:
-  our-freezer-postgres_data:
+  frost-mind-postgres_data:
