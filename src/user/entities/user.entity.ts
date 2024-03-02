@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UserFreezer } from "../../freezer/entities/user-freezer.entity";
 
 @Entity()
 export class User {
@@ -13,6 +14,9 @@ export class User {
 
   @Column({ type: 'varchar', length: 255 })
   password_hash: string;
+
+  @OneToMany(() => UserFreezer, userFreezer => userFreezer.user)
+  userFreezers: UserFreezer[];
 
   @CreateDateColumn()
   created_at: Date;
