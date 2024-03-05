@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { FreezerService } from './freezer.service';
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CreateFreezerDto } from "./dto/create-freezer.dto";
 import { UpdateFreezerDto } from "./dto/update-freezer.dto";
+import { GetUserId } from "../core/decorators/get-user-id.decorator";
 
 
 @Controller('freezers')
@@ -11,41 +12,37 @@ export class FreezerController {
 
     @UseGuards(JwtAuthGuard)
     @Post()
-    async create(@Body() createFreezerDto: CreateFreezerDto, @Request() req) {
-        return this.freezerService.createFreezer(createFreezerDto.name, this.getUserIdFromReq(req));
+    async create(@Body() createFreezerDto: CreateFreezerDto, @GetUserId() userId: number) {
+        return this.freezerService.createFreezer(createFreezerDto.name, userId);
     }
 
     @UseGuards(JwtAuthGuard)
     @Post(':freezerId/users/:username')
-    assignFreezerToUser(@Param('freezerId') freezerId: number, @Param('username') username: string, @Request() req) {
-        return this.freezerService.assignFreezerToUser(freezerId, this.getUserIdFromReq(req), username);
+    assignFreezerToUser(@Param('freezerId') freezerId: number, @Param('username') username: string, @GetUserId() userId: number) {
+        return this.freezerService.assignFreezerToUser(freezerId, userId, username);
     }
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    findFreezers(@Request() req) {
-        return this.freezerService.findFreezersByUser(this.getUserIdFromReq(req));
+    findFreezers(@GetUserId() userId: number) {
+        return this.freezerService.findFreezersByUser(userId);
     }
 
     @UseGuards(JwtAuthGuard)
     @Put(':freezerId')
-    updateFreezer(@Param('freezerId') freezerId: number, @Body() updateFreezerDto: UpdateFreezerDto, @Request() req) {
-        return this.freezerService.updateFreezer(freezerId, this.getUserIdFromReq(req), updateFreezerDto.name);
+    updateFreezer(@Param('freezerId') freezerId: number, @Body() updateFreezerDto: UpdateFreezerDto, @GetUserId() userId: number) {
+        return this.freezerService.updateFreezer(freezerId, userId, updateFreezerDto.name);
     }
 
     @UseGuards(JwtAuthGuard)
     @Delete(':freezerId')
-    removeFreezer(@Param('freezerId') freezerId: number, @Request() req) {
-        return this.freezerService.removeFreezer(freezerId, this.getUserIdFromReq(req));
+    removeFreezer(@Param('freezerId') freezerId: number, @GetUserId() userId: number) {
+        return this.freezerService.removeFreezer(freezerId, userId);
     }
 
     @UseGuards(JwtAuthGuard)
     @Delete(':freezerId/users/:username')
-    unassignFreezerFromUser(@Param('freezerId') freezerId: number, @Param('username') username: string, @Request() req) {
-        return this.freezerService.unassignFreezerFromUser(freezerId, this.getUserIdFromReq(req), username);
-    }
-
-    private getUserIdFromReq(req): number {
-        return req.user.userId;
+    unassignFreezerFromUser(@Param('freezerId') freezerId: number, @Param('username') username: string, @GetUserId() userId: number) {
+        return this.freezerService.unassignFreezerFromUser(freezerId, userId, username);
     }
 }
