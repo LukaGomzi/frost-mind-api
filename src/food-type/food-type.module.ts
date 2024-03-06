@@ -12,5 +12,6 @@ import { UserModule } from "../user/user.module";
     ],
     controllers: [FoodTypeController],
     providers: [FoodTypeService],
+    exports: [FoodTypeService]
 })
 export class FoodTypeModule {}
