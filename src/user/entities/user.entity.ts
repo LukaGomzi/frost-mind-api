@@ -24,4 +24,7 @@ export class User {
 
   @OneToMany(() => FoodType, foodType => foodType.createdBy)
   foodTypes: FoodType[];
+
+  @Column({ nullable: true })
+  refreshToken?: string;
 }

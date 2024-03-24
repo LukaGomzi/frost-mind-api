@@ -55,4 +55,13 @@ export class UserService {
   removeUser(id: number): Promise<{ affected?: number }> {
     return this.userRepository.delete(id);
   }
+
+  async saveRefreshToken(id: number, refreshToken: string): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`User with ID '${id}' not found.`);
+    }
+    user.refreshToken = refreshToken;
+    await this.userRepository.save(user);
+  }
 }
