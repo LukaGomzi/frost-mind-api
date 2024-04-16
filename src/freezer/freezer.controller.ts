@@ -31,6 +31,12 @@ export class FreezerController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get(':freezerId')
+    findFreezerById(@Param('freezerId') freezerId: number, @GetUserId() userId: number) {
+        return this.freezerService.findFreezerByIdAndUser(freezerId, userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Put(':freezerId')
     updateFreezer(@Param('freezerId') freezerId: number, @Body() updateFreezerDto: UpdateFreezerDto, @GetUserId() userId: number) {
         return this.freezerService.updateFreezer(freezerId, userId, updateFreezerDto.name);
