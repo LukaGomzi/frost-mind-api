@@ -63,7 +63,9 @@ export class FreezerService {
     async findFreezersByUser(userId: number): Promise<Freezer[]> {
         const userFreezers = await this.userFreezerRepository.find({
             relations: {
-                freezer: true
+                freezer: {
+                    foodItems: true
+                }
             },
             where: {
                 user: {
@@ -78,7 +80,9 @@ export class FreezerService {
     async findFreezerByIdAndUser(freezerId, userId): Promise<Freezer> {
         const userFreezer = await this.userFreezerRepository.findOne({
             relations: {
-                freezer: true
+                freezer: {
+                    foodItems: true
+                }
             },
             where: {
                 user: {
@@ -94,13 +98,15 @@ export class FreezerService {
             throw new NotFoundException(`Freezer with id ${freezerId} not found on user with id ${userId}!`);
         }
 
-        return userFreezer.freezer;
+        return userFreezer.freezer || undefined;
     }
 
     async getUserFreezersByFreezerId(freezerId: number): Promise<UserFreezer[]> {
         const userFreezer = await this.userFreezerRepository.find({
             relations: {
-                freezer: true,
+                freezer: {
+                    foodItems: true
+                },
                 user: true
             },
             where: {

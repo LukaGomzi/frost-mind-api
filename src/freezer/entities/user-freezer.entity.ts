@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from "../../user/entities/user.entity";
 import { Freezer } from "./freezer.entity";
 
-
 @Entity()
 export class UserFreezer {
     @PrimaryGeneratedColumn()

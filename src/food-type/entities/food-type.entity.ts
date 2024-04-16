@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Unique, OneToMany } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { FoodItem } from "../../freezer/entities/food-item.entity";
 
 @Entity()
 @Unique(['name', 'createdById'])
@@ -19,4 +20,7 @@ export class FoodType {
     @ManyToOne(() => User, user => user.foodTypes, { nullable: true })
     @JoinColumn({ name: 'createdById' })
     createdBy: User;
+
+    @OneToMany(() => FoodItem, foodItem => foodItem.foodType)
+    foodItems: FoodItem[];
 }

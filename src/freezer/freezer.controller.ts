@@ -4,11 +4,13 @@ import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CreateFreezerDto } from "./dto/create-freezer.dto";
 import { UpdateFreezerDto } from "./dto/update-freezer.dto";
 import { GetUserId } from "../core/decorators/get-user-id.decorator";
+import { AddItemDto } from "./dto/add-item.dto";
+import { FoodItemService } from "./food-item.service";
 
 
 @Controller('freezers')
 export class FreezerController {
-    constructor(private readonly freezerService: FreezerService) {}
+    constructor(private readonly freezerService: FreezerService, private readonly foodItemService: FoodItemService) {}
 
     @UseGuards(JwtAuthGuard)
     @Post()
@@ -44,5 +46,11 @@ export class FreezerController {
     @Delete(':freezerId/users/:username')
     unassignFreezerFromUser(@Param('freezerId') freezerId: number, @Param('username') username: string, @GetUserId() userId: number) {
         return this.freezerService.unassignFreezerFromUser(freezerId, userId, username);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':freezerId/item')
+    addItemToFreezer(@Param('freezerId') freezerId: number, @Body() addItemDto: AddItemDto, @GetUserId() userId: number) {
+        return this.foodItemService.create(addItemDto, freezerId, userId);
     }
 }

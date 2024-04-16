@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
 import { UserFreezer } from "./user-freezer.entity";
+import { FoodItem } from "./food-item.entity";
 
 @Entity()
 export class Freezer {
@@ -11,6 +12,9 @@ export class Freezer {
 
     @OneToMany(() => UserFreezer, userFreezer => userFreezer.freezer)
     userFreezers: UserFreezer[];
+
+    @OneToMany(() => FoodItem, foodItem => foodItem.freezer)
+    foodItems: FoodItem[];
 
     @CreateDateColumn()
     created_at: Date;
