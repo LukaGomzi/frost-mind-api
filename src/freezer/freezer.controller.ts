@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { FreezerService } from './freezer.service';
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CreateFreezerDto } from "./dto/create-freezer.dto";
@@ -6,6 +6,7 @@ import { UpdateFreezerDto } from "./dto/update-freezer.dto";
 import { GetUserId } from "../core/decorators/get-user-id.decorator";
 import { AddItemDto } from "./dto/add-item.dto";
 import { FoodItemService } from "./food-item.service";
+import { TakeItemOutDto } from "./dto/take-item-out.dto";
 
 
 @Controller('freezers')
@@ -58,5 +59,16 @@ export class FreezerController {
     @Post(':freezerId/item')
     addItemToFreezer(@Param('freezerId') freezerId: number, @Body() addItemDto: AddItemDto, @GetUserId() userId: number) {
         return this.foodItemService.create(addItemDto, freezerId, userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':freezerId/item/take-out')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async takeItemOutOfTheFreezer(
+        @Param('freezerId') freezerId: number,
+        @Body() takeItemOutDto: TakeItemOutDto,
+        @GetUserId() userId: number
+    ) {
+        await this.foodItemService.takeItemFromFreezer(freezerId, takeItemOutDto, userId);
     }
 }

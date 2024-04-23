@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Freezer } from './entities/freezer.entity';
 import { UserFreezer } from "./entities/user-freezer.entity";
 import { UserService } from "../user/user.service";
+import { TakeItemOutDto } from "./dto/take-item-out.dto";
 
 @Injectable()
 export class FreezerService {
