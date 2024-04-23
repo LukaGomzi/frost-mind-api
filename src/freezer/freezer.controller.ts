@@ -7,6 +7,7 @@ import { GetUserId } from "../core/decorators/get-user-id.decorator";
 import { AddItemDto } from "./dto/add-item.dto";
 import { FoodItemService } from "./food-item.service";
 import { TakeItemOutDto } from "./dto/take-item-out.dto";
+import { DisposeItemDto } from "./dto/dispose-item.dto";
 
 
 @Controller('freezers')
@@ -71,4 +72,16 @@ export class FreezerController {
     ) {
         await this.foodItemService.takeItemFromFreezer(freezerId, takeItemOutDto, userId);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':freezerId/item/dispose-item')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async disposeItem(
+        @Param('freezerId') freezerId: number,
+        @Body() disposeItemDto: DisposeItemDto,
+        @GetUserId() userId: number
+    ) {
+        await this.foodItemService.disposeItem(freezerId, disposeItemDto, userId);
+    }
+
 }

@@ -1,13 +1,15 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FoodItem } from "./entities/food-item.entity";
-import { Repository } from "typeorm";
+import { LessThan, Repository } from "typeorm";
 import { FoodTypeService } from "../food-type/food-type.service";
 import { AddItemDto } from "./dto/add-item.dto";
 import { FreezerService } from "./freezer.service";
 import { TakeItemOutDto } from "./dto/take-item-out.dto";
 import { Freezer } from "./entities/freezer.entity";
 import { TakenItem } from "./entities/taken-item.entity";
+import { ExpiredItem } from "./entities/expired-item.entity";
+import { DisposeItemDto } from "./dto/dispose-item.dto";
 
 @Injectable()
 export class FoodItemService {
@@ -16,6 +18,8 @@ export class FoodItemService {
         private readonly foodItemRepository: Repository<FoodItem>,
         @InjectRepository(TakenItem)
         private readonly takenItemRepository: Repository<TakenItem>,
+        @InjectRepository(ExpiredItem)
+        private readonly expiredItemRepository: Repository<ExpiredItem>,
         private readonly foodTypeService: FoodTypeService,
         private readonly freezerService: FreezerService,
     ) {}
@@ -87,7 +91,44 @@ export class FoodItemService {
         }
     }
 
+    async disposeItem(freezerId: number, disposeItemDto: DisposeItemDto, userId: number): Promise<void> {
+        const freezer = await this.getUserFreezer(freezerId, userId);
+        if (!freezer) {
+            throw new NotFoundException(`Freezer with ID "${freezerId}" doesn't exist or user with ID "${userId}" doesn't have permission for it.`);
+        }
 
+        const item = await this.foodItemRepository.findOne({
+            where: {
+                id: disposeItemDto.itemId,
+                freezer_id: freezerId
+            }
+        });
+
+        if (!item) {
+            throw new NotFoundException(`Item with ID "${disposeItemDto.itemId}" not found in freezer ID "${freezerId}".`);
+        }
+
+        if (item.quantity < disposeItemDto.quantity) {
+            throw new Error('Not enough quantity available to dispose.');
+        }
+
+        const expiredItem = new ExpiredItem();
+        expiredItem.name = item.name;
+        expiredItem.weight = item.weight;
+        expiredItem.quantity = disposeItemDto.quantity;
+        expiredItem.foodTypeId = item.food_type_id;
+        expiredItem.freezerId = freezerId;
+
+        await this.expiredItemRepository.save(expiredItem);
+
+        // Update or remove the FoodItem based on the remaining quantity
+        if (item.quantity > disposeItemDto.quantity) {
+            item.quantity -= disposeItemDto.quantity;
+            await this.foodItemRepository.save(item);
+        } else {
+            await this.foodItemRepository.remove(item);
+        }
+    }
 
     private async getUserFreezer(freezerId: number, userId: number): Promise<Freezer | undefined> {
         const freezer = await this.freezerService.findFreezerByIdAndUser(freezerId, userId);

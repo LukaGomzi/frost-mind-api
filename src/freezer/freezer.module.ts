@@ -9,10 +9,11 @@ import { FoodItem } from "./entities/food-item.entity";
 import { FoodItemService } from "./food-item.service";
 import { FoodTypeModule } from "../food-type/food-type.module";
 import { TakenItem } from "./entities/taken-item.entity";
+import { ExpiredItem } from "./entities/expired-item.entity";
 
 @Module({
   imports: [
-      TypeOrmModule.forFeature([Freezer, UserFreezer, FoodItem, TakenItem]),
+      TypeOrmModule.forFeature([Freezer, UserFreezer, FoodItem, TakenItem, ExpiredItem]),
       UserModule,
       FoodTypeModule,
   ],
