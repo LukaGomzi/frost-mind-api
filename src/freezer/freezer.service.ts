@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Freezer } from './entities/freezer.entity';
 import { UserFreezer } from "./entities/user-freezer.entity";
 import { UserService } from "../user/user.service";
-import { TakeItemOutDto } from "./dto/take-item-out.dto";
 
 @Injectable()
 export class FreezerService {
@@ -75,7 +74,11 @@ export class FreezerService {
             }
         });
 
-        return userFreezers.map(userFreezer => userFreezer.freezer);
+        return userFreezers.map(userFreezer => {
+            const freezer = userFreezer.freezer;
+            freezer.foodItems = freezer.foodItems.filter(foodItem => foodItem.quantity > 0);
+            return freezer;
+        });
     }
 
     async findFreezerByIdAndUser(freezerId, userId): Promise<Freezer> {
@@ -99,11 +102,13 @@ export class FreezerService {
             throw new NotFoundException(`Freezer with id ${freezerId} not found on user with id ${userId}!`);
         }
 
-        return userFreezer.freezer || undefined;
+        const freezer = userFreezer.freezer;
+        freezer.foodItems = freezer.foodItems.filter(foodItem => foodItem.quantity > 0);
+        return freezer || undefined;
     }
 
     async getUserFreezersByFreezerId(freezerId: number): Promise<UserFreezer[]> {
-        const userFreezer = await this.userFreezerRepository.find({
+        const userFreezers = await this.userFreezerRepository.find({
             relations: {
                 freezer: {
                     foodItems: true
@@ -117,11 +122,16 @@ export class FreezerService {
             }
         });
 
-        if (!userFreezer) {
+        if (!userFreezers || userFreezers.length === 0) {
             throw new NotFoundException(`Freezer with id ${freezerId} not found!`);
         }
 
-        return userFreezer;
+        userFreezers.forEach(userFreezer => {
+            const freezer = userFreezer.freezer;
+            freezer.foodItems = freezer.foodItems.filter(foodItem => foodItem.quantity > 0);
+        });
+
+        return userFreezers;
     }
 
     async updateFreezer(freezerId: number, userId: number, newName: string): Promise<Freezer> {
