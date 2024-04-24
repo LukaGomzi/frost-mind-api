@@ -4,6 +4,7 @@ import { DatabaseModule } from "./config/database/database.module";
 import { AuthModule } from "./auth/auth.module";
 import { FreezerModule } from './freezer/freezer.module';
 import { FoodTypeModule } from "./food-type/food-type.module";
+import { StatisticsModule } from "./statistics/statistics.module";
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { FoodTypeModule } from "./food-type/food-type.module";
     AuthModule,
     FreezerModule,
     FoodTypeModule,
+    StatisticsModule,
   ]
 })
 export class AppModule {}

@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { FoodType } from "../../food-type/entities/food-type.entity";
+import { Freezer } from "./freezer.entity";
 
 @Entity()
 export class ExpiredItem {
@@ -20,6 +22,14 @@ export class ExpiredItem {
     @Column()
     foodTypeId: number;
 
+    @ManyToOne(() => FoodType)
+    @JoinColumn({ name: 'foodTypeId' })
+    foodType: FoodType;
+
     @Column()
     freezerId: number;
+
+    @ManyToOne(() => Freezer)
+    @JoinColumn({ name: 'freezerId' })
+    freezer: Freezer;
 }
