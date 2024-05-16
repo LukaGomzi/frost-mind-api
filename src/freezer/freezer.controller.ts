@@ -27,6 +27,12 @@ export class FreezerController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get(':freezerId/users')
+    getAssignedUsersToFreezer(@Param('freezerId') freezerId: number, @GetUserId() userId: number) {
+        return this.freezerService.getUsersByFreezerId(freezerId);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get()
     findFreezers(@GetUserId() userId: number) {
         return this.freezerService.findFreezersByUser(userId);

@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Freezer } from './entities/freezer.entity';
 import { UserFreezer } from "./entities/user-freezer.entity";
 import { UserService } from "../user/user.service";
+import { User } from "../user/entities/user.entity";
+import { UserDto } from "./dto/user.dto";
 
 @Injectable()
 export class FreezerService {
@@ -132,6 +134,28 @@ export class FreezerService {
         });
 
         return userFreezers;
+    }
+
+    async getUsersByFreezerId(freezerId: number): Promise<UserDto[]> {
+        const userFreezers = await this.userFreezerRepository.find({
+            relations: {
+                user: true
+            },
+            where: {
+                freezer: {
+                    id: freezerId
+                }
+            }
+        });
+
+        if (!userFreezers || userFreezers.length === 0) {
+            throw new NotFoundException(`Freezer with id ${freezerId} not found!`);
+        }
+
+        return userFreezers.map(userFreezer => {
+            const { id, username, email } = userFreezer.user;
+            return { id, username, email };
+        });
     }
 
     async updateFreezer(freezerId: number, userId: number, newName: string): Promise<Freezer> {
