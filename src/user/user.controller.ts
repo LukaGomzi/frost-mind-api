@@ -2,10 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpExce
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { MailerService } from "../mailer/mailer.service";
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly mailerService: MailerService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -24,6 +25,7 @@ export class UserController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
+    console.log('/???')
     return this.userService.viewUser(+id);
   }
 

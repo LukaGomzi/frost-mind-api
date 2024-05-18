@@ -5,6 +5,7 @@ import { AuthModule } from "./auth/auth.module";
 import { FreezerModule } from './freezer/freezer.module';
 import { FoodTypeModule } from "./food-type/food-type.module";
 import { StatisticsModule } from "./statistics/statistics.module";
+import { MailerModule } from "./mailer/mailer.module";
 
 @Module({
   imports: [
@@ -14,6 +15,8 @@ import { StatisticsModule } from "./statistics/statistics.module";
     FreezerModule,
     FoodTypeModule,
     StatisticsModule,
-  ]
+    MailerModule
+  ],
+  providers: []
 })
 export class AppModule {}
