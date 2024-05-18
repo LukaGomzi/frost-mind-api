@@ -5,11 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+import { MailerService } from "../mailer/mailer.service";
 
 @Injectable()
 export class UserService {
   constructor(
       @InjectRepository(User) private readonly userRepository: Repository<User>,
+      private mailerService: MailerService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -19,6 +22,29 @@ export class UserService {
 
     const salt = await bcrypt.genSalt();
     user.password_hash = await bcrypt.hash(createUserDto.password, salt);
+
+    user.confirmationToken = crypto.randomBytes(32).toString('hex');
+
+    const newUser = await this.userRepository.save(user);
+
+    const confirmUrl = `http://localhost:3000/users/confirm/${user.confirmationToken}`;
+    await this.mailerService.sendMail(
+        newUser.email,
+        'Email Confirmation',
+        'Please confirm your email by clicking the link below:',
+        `<a href="${confirmUrl}">Confirm Email</a>`
+    );
+
+    return newUser;
+  }
+
+  async confirmUser(token: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { confirmationToken: token } });
+    if (!user) {
+      throw new Error('Invalid confirmation token');
+    }
+    user.isConfirmed = true;
+    user.confirmationToken = null;
     return this.userRepository.save(user);
   }
 

@@ -27,4 +27,10 @@ export class User {
 
   @Column({ nullable: true })
   refreshToken?: string;
+
+  @Column({ nullable: true })
+  confirmationToken: string;
+
+  @Column({ default: false })
+  isConfirmed: boolean;
 }

@@ -54,7 +54,7 @@ export class UserController {
       const newUser = await this.userService.createUser(createUserDto);
       return {
         statusCode: HttpStatus.CREATED,
-        message: 'User successfully registered',
+        message: 'User successfully registered. Please check your email to confirm your registration.',
         data: {
           id: newUser.id,
           username: newUser.username,
@@ -66,6 +66,22 @@ export class UserController {
       throw new HttpException({
         status: HttpStatus.BAD_REQUEST,
         error: 'There was a problem registering the user.',
+      }, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('confirm/:token')
+  async confirm(@Param('token') token: string) {
+    try {
+      await this.userService.confirmUser(token);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Email successfully confirmed.',
+      };
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Invalid or expired confirmation token.',
       }, HttpStatus.BAD_REQUEST);
     }
   }
