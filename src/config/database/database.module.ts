@@ -16,6 +16,7 @@ import { ConfigModule } from "@nestjs/config";
             database: process.env.DBPSQL_NAME,
             synchronize: process.env.SYNCHRONIZE == 'true',
             logging: true,
+            ssl: {rejectUnauthorized: false},
         }),
     ]
 })
